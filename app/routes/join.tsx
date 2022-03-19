@@ -8,7 +8,6 @@ import {
   json,
   useActionData,
 } from "remix";
-import Alert from "@reach/alert";
 
 import { getUserId, createUserSession } from "~/session.server";
 
@@ -18,7 +17,7 @@ import { validateEmail } from "~/utils";
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
   if (userId) return redirect("/");
-  return {};
+  return json({});
 };
 
 interface ActionData {
@@ -41,9 +40,16 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
 
-  if (typeof password !== "string" || password.length === 0) {
+  if (typeof password !== "string") {
     return json<ActionData>(
       { errors: { password: "Password is required" } },
+      { status: 400 }
+    );
+  }
+
+  if (password.length < 8) {
+    return json<ActionData>(
+      { errors: { password: "Password is too short" } },
       { status: 400 }
     );
   }
@@ -58,23 +64,24 @@ export const action: ActionFunction = async ({ request }) => {
 
   const user = await createUser(email, password);
 
-  return createUserSession(
+  return createUserSession({
     request,
-    user.id,
-    typeof redirectTo === "string" ? redirectTo : "/"
-  );
+    userId: user.id,
+    remember: false,
+    redirectTo: typeof redirectTo === "string" ? redirectTo : "/",
+  });
 };
 
 export const meta: MetaFunction = () => {
   return {
-    title: "Join",
+    title: "Sign Up",
   };
 };
 
-export default function JoinPage() {
+export default function Join() {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") ?? undefined;
-  const actionData = useActionData<ActionData>();
+  const actionData = useActionData() as ActionData;
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
@@ -87,98 +94,85 @@ export default function JoinPage() {
   }, [actionData]);
 
   return (
-    <div
-      style={{
-        maxWidth: 500,
-        margin: "30vh auto 0 auto",
-      }}
-    >
-      <h1 style={{ textAlign: "center" }}>Join Remix Notes</h1>
-      <Form
-        method="post"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          width: 300,
-          margin: "auto",
-        }}
-      >
-        <input type="hidden" name="redirectTo" value={redirectTo} />
-        <div>
-          <label
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              width: "100%",
-            }}
+    <div className="flex min-h-full flex-col justify-center">
+      <div className="mx-auto w-full max-w-md px-8">
+        <Form method="post" className="space-y-6" noValidate>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email address
+            </label>
+            <div className="mt-1">
+              <input
+                ref={emailRef}
+                id="email"
+                required
+                autoFocus={true}
+                name="email"
+                type="email"
+                autoComplete="email"
+                aria-invalid={actionData?.errors?.email ? true : undefined}
+                aria-describedby="email-error"
+                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              />
+              {actionData?.errors?.email && (
+                <div className="pt-1 text-red-700" id="email-error">
+                  {actionData.errors.email}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <div className="mt-1">
+              <input
+                id="password"
+                ref={passwordRef}
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                aria-invalid={actionData?.errors?.password ? true : undefined}
+                aria-describedby="password-error"
+                className="w-full rounded border border-gray-500 px-2 py-1 text-lg"
+              />
+              {actionData?.errors?.password && (
+                <div className="pt-1 text-red-700" id="password-error">
+                  {actionData.errors.password}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <button
+            type="submit"
+            className="w-full rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
           >
-            <span>Email address</span>
-            <input
-              ref={emailRef}
-              autoFocus={true}
-              style={{ flex: 1, lineHeight: 2, fontSize: "1.1rem" }}
-              name="email"
-              type="email"
-              autoComplete="email"
-              aria-invalid={actionData?.errors?.email ? true : undefined}
-              aria-errormessage={
-                actionData?.errors.email ? "email-error" : undefined
-              }
-            />
-          </label>
-          {actionData?.errors?.email && (
-            <Alert style={{ color: "red", paddingTop: 4 }} id="email-error">
-              {actionData.errors.email}
-            </Alert>
-          )}
-        </div>
-
-        <div>
-          <label
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              width: "100%",
-            }}
-          >
-            <span>Password</span>
-            <input
-              ref={passwordRef}
-              style={{ flex: 1, lineHeight: 2, fontSize: "1.1rem" }}
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              aria-invalid={actionData?.errors?.password ? true : undefined}
-              aria-errormessage={
-                actionData?.errors.password ? "password-error" : undefined
-              }
-            />
-          </label>
-          {actionData?.errors?.password && (
-            <Alert style={{ color: "red", paddingTop: 4 }} id="password-error">
-              {actionData.errors.password}
-            </Alert>
-          )}
-        </div>
-
-        <div style={{ textAlign: "right" }}>
-          <button type="submit">Join</button>
-        </div>
-      </Form>
-
-      <div style={{ paddingTop: 24, textAlign: "right" }}>
-        Already have an account?{" "}
-        <Link
-          to={{
-            pathname: "/login",
-            search: redirectTo ? `?redirectTo=${redirectTo}` : undefined,
-          }}
-        >
-          Log in
-        </Link>
+            Create Account
+          </button>
+          <div className="flex items-center justify-center">
+            <div className="text-center text-sm text-gray-500">
+              Already have an account?{" "}
+              <Link
+                className="text-blue-500 underline"
+                to={{
+                  pathname: "/login",
+                  search: searchParams.toString(),
+                }}
+              >
+                Log in
+              </Link>
+            </div>
+          </div>
+        </Form>
       </div>
     </div>
   );

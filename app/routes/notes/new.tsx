@@ -34,13 +34,13 @@ export const action: ActionFunction = async ({ request }) => {
     );
   }
 
-  const note = await createNote(title, body, userId);
+  const note = await createNote({ title, body, userId });
 
   return redirect(`/notes/${note.id}`);
 };
 
 export default function NewNotePage() {
-  const actionData = useActionData<ActionData>();
+  const actionData = useActionData() as ActionData;
   const titleRef = React.useRef<HTMLInputElement>(null);
   const bodyRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -63,12 +63,12 @@ export default function NewNotePage() {
       }}
     >
       <div>
-        <label>
-          <span style={{ display: "block" }}>Title: </span>
+        <label className="flex w-full flex-col gap-1">
+          <span>Title: </span>
           <input
             ref={titleRef}
             name="title"
-            style={{ marginTop: 4, fontSize: "1.1rem", lineHeight: 2 }}
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
             aria-invalid={actionData?.errors?.title ? true : undefined}
             aria-errormessage={
               actionData?.errors?.title ? "title-error" : undefined
@@ -76,25 +76,20 @@ export default function NewNotePage() {
           />
         </label>
         {actionData?.errors?.title && (
-          <Alert style={{ color: "red" }} id="title=error">
+          <Alert className="pt-1 text-red-700" id="title=error">
             {actionData.errors.title}
           </Alert>
         )}
       </div>
 
       <div>
-        <label>
-          <span style={{ display: "block" }}>Body: </span>
+        <label className="flex w-full flex-col gap-1">
+          <span>Body: </span>
           <textarea
             ref={bodyRef}
             name="body"
             rows={8}
-            style={{
-              marginTop: 4,
-              width: "100%",
-              fontSize: "1.1rem",
-              lineHeight: 1.4,
-            }}
+            className="w-full flex-1 rounded-md border-2 border-blue-500 py-2 px-3 text-lg leading-6"
             aria-invalid={actionData?.errors?.body ? true : undefined}
             aria-errormessage={
               actionData?.errors?.body ? "body-error" : undefined
@@ -102,14 +97,19 @@ export default function NewNotePage() {
           />
         </label>
         {actionData?.errors?.body && (
-          <Alert style={{ color: "red" }} id="body=error">
+          <Alert className="pt-1 text-red-700" id="body=error">
             {actionData.errors.body}
           </Alert>
         )}
       </div>
 
-      <div>
-        <button type="submit">Save</button>
+      <div className="text-right">
+        <button
+          type="submit"
+          className="rounded bg-blue-500  py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400"
+        >
+          Save
+        </button>
       </div>
     </Form>
   );
