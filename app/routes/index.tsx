@@ -3,6 +3,7 @@ import { useOptionalUser } from "~/utils";
 
 export default function Index() {
   const user = useOptionalUser();
+  
   return (
     <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
       <div className="relative sm:pb-16 sm:pt-8">
@@ -19,7 +20,7 @@ export default function Index() {
             <div className="lg:pb-18 relative px-4 pt-16 pb-8 sm:px-6 sm:pt-24 sm:pb-14 lg:px-8 lg:pt-32">
               <h1 className="text-center text-6xl font-extrabold tracking-tight sm:text-8xl lg:text-9xl">
                 <span className="block uppercase text-blue-500 drop-shadow-md">
-                  Blues Stack
+                  Trap Stack
                 </span>
               </h1>
               <p className="mx-auto mt-6 max-w-lg text-center text-xl text-white sm:max-w-3xl">
@@ -65,6 +66,11 @@ export default function Index() {
         <div className="mx-auto max-w-7xl py-2 px-4 sm:px-6 lg:px-8">
           <div className="mt-6 flex flex-wrap justify-center gap-8">
             {[
+              {
+                src: "https://www.svgrepo.com/show/327408/logo-vercel.svg",
+                alt: "Vercel",
+                href: "https://www.vercel.com/",
+              },
               {
                 src: "https://user-images.githubusercontent.com/1500684/158238105-e7279a0c-1640-40db-86b0-3d3a10aab824.svg",
                 alt: "PostgreSQL",

@@ -1,6 +1,6 @@
-# Remix Blues Stack
+# Remix Trap Stack
 
-![The Remix Blues Stack](https://repository-images.githubusercontent.com/461012689/37d5bd8b-fa9c-4ab0-893c-f0a199d5012d)
+![The Remix Trap Stack](https://repository-images.githubusercontent.com/461012689/37d5bd8b-fa9c-4ab0-893c-f0a199d5012d)
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
