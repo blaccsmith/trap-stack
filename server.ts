@@ -2,6 +2,7 @@ import path from "path";
 import express from "express";
 import compression from "compression";
 import morgan from "morgan";
+import * as build from '@remix-run/dev/server-build';
 import { createRequestHandler } from "@remix-run/express";
 
 const app = express();
@@ -36,7 +37,7 @@ app.disable("x-powered-by");
 
 // Remix fingerprints its assets so we can cache forever.
 app.use(
-  "/build",
+  "public/build",
   express.static("public/build", { immutable: true, maxAge: "1y" })
 );
 
@@ -47,12 +48,12 @@ app.use(express.static("public", { maxAge: "1h" }));
 app.use(morgan("tiny"));
 
 const MODE = process.env.NODE_ENV;
-const BUILD_DIR = path.join(process.cwd(), "build");
+const BUILD_DIR = path.join(process.cwd(), "public/build");
 
 app.all(
   "*",
   MODE === "production"
-    ? createRequestHandler({ build: require(BUILD_DIR) })
+    ? createRequestHandler({ build })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createRequestHandler({
