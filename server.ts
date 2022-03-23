@@ -53,7 +53,7 @@ const BUILD_DIR = path.join(process.cwd(), "public/build");
 app.all(
   "*",
   MODE === "production"
-    ? createRequestHandler({ build })
+    ? createRequestHandler({ build: require(BUILD_DIR) })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createRequestHandler({
