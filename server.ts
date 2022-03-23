@@ -85,3 +85,5 @@ function purgeRequireCache() {
     }
   }
 }
+
+export default createRequestHandler({build, mode: MODE});
